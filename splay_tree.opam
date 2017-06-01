@@ -6,7 +6,7 @@ bug-reports: "https://github.com/janestreet/splay_tree/issues"
 dev-repo: "git+https://github.com/janestreet/splay_tree.git"
 license: "Apache-2.0"
 build: [
-  ["jbuilder" "build" "--only-packages" "splay_tree" "--root" "." "-j" jobs "@install"]
+  ["jbuilder" "build" "-p" name "-j" jobs]
 ]
 depends: [
   "core_kernel"
