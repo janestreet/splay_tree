@@ -1,5 +1,6 @@
 (library
  ((name splay_tree_test)
+  (flags (:standard -safe-string))
   (libraries (
     core_kernel
     splay_tree
@@ -7,6 +8,5 @@
     ))
   (preprocess (pps (ppx_jane ppx_driver.runner)))
 ))
-
 
 (jbuild_version 1)
