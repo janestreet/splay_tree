@@ -23,7 +23,7 @@ let make_tree =
 
 let tree_and_map =
   List.fold ~init:(T.empty, Int.Map.empty) ~f:(fun (t, m) (key, data) ->
-    (T.set t ~key ~data, Map.add m ~key ~data))
+    (T.set t ~key ~data, Map.set m ~key ~data))
 
 let tree_and_map_gen = Quickcheck.Generator.map alist_gen ~f:tree_and_map
 
@@ -152,7 +152,7 @@ let%test_unit "mem; find" =
         [%test_result: int option] ~expect:(Map.find map key) (T.find t key);
 
         let t = T.set t ~key ~data in
-        let map = Map.add map ~key ~data in
+        let map = Map.set map ~key ~data in
 
         assert (T.mem t key);
         [%test_result: int option] ~expect:(Some data) (T.find t key);
@@ -237,7 +237,7 @@ let%test_unit "map_range" =
       and m =
         List.fold replacement_alist
           ~init:(Map.filter_keys m ~f:(fun x -> x < min || x > max))
-          ~f:(fun m (key, data) -> Map.add m ~key ~data)
+          ~f:(fun m (key, data) -> Map.set m ~key ~data)
       in
       [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t)
     )
