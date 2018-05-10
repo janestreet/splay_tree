@@ -23,7 +23,9 @@ end
 
 module type Reduction_operation = sig
   type key
+
   type data
+
   type accum
 
   val identity : accum
@@ -33,7 +35,6 @@ module type Reduction_operation = sig
   (** [combine] is required to be associative and have [identity] as its identity.
       In other words, they must form a monoid. *)
   val combine : accum -> accum -> accum
-
 end
 
 type ('k, 'd, 'a) reduction_operation =
@@ -41,38 +42,50 @@ type ('k, 'd, 'a) reduction_operation =
 
 module type S = sig
   type t [@@deriving sexp]
+
   type key [@@deriving sexp]
+
   type data [@@deriving sexp]
+
   type accum
 
   val empty : t
 
-  val of_alist     : (key * data) list -> t Or_error.t
+  val of_alist : (key * data) list -> t Or_error.t
+
   val of_alist_exn : (key * data) list -> t
 
   val to_alist : t -> (key * data) list
 
   val is_empty : t -> bool
+
   val length : t -> int
 
   val accum : t -> accum
 
   val keys : t -> key list
+
   val data : t -> data list
 
   val mem : t -> key -> bool
+
   val find : t -> key -> data option
+
   val set : t -> key:key -> data:data -> t
 
   val remove : t -> key -> t
 
 
   val remove_min : t -> (key * data * t) option
+
   val remove_max : t -> (key * data * t) option
-  val remove_after  : t -> key -> (key * data * t) option
+
+  val remove_after : t -> key -> (key * data * t) option
+
   val remove_before : t -> key -> (key * data * t) option
 
   val map : t -> f:(data -> data) -> t
+
   val map_range
     :  t
     -> min_key:key
@@ -136,11 +149,14 @@ module type S = sig
     -> (key * data) option
 
   module Partition : sig
-    type nonrec t = {
-      lt  : t; (* values less than the [min_key] of the partition *)
-      mid : t; (* values between [min_key] and [max_key] *)
-      gt  : t; (* values greater than the [max_key] of the partition *)
-    }
+    type nonrec t =
+      { (* [lt] = values less than the [min_key] of the partition *)
+        lt : t
+      ; (* [mid] = values between [min_key] and [max_key] *)
+        mid : t
+      ; (* [gt] = values greater than the [max_key] of the partition *)
+        gt : t
+      }
   end
 
   val partition : ?min_key:key -> ?max_key:key -> t -> Partition.t
@@ -170,28 +186,29 @@ module type S = sig
       worst-case linear time.
   *)
   val join : t -> t -> t Or_error.t
+
   val join_exn : t -> t -> t
 end
 
 module type Splay_tree = sig
-  module type Key                 = Key
-  module type Data                = Data
+  module type Key = Key
+
+  module type Data = Data
+
   module type Reduction_operation = Reduction_operation
 
   type nonrec ('k, 'd, 'a) reduction_operation = ('k, 'd, 'a) reduction_operation
 
   module type S = S
 
-  module Make_with_reduction (Key : Key) (Data : Data)
-      (R : Reduction_operation with type key = Key.t and type data = Data.t)
-    : (S with type key = Key.t
-          and type data = Data.t
-          and type accum = R.accum)
+  module Make_with_reduction
+      (Key : Key)
+      (Data : Data)
+      (R : Reduction_operation with type key = Key.t and type data = Data.t) :
+    S with type key = Key.t and type data = Data.t and type accum = R.accum
 
-  module Make_without_reduction (Key : Key) (Data : Data)
-    : (S with type key = Key.t
-          and type data = Data.t
-          and type accum = unit)
+  module Make_without_reduction (Key : Key) (Data : Data) :
+    S with type key = Key.t and type data = Data.t and type accum = unit
 
   module Reduction_operations : sig
     val reduce2
