@@ -102,8 +102,7 @@ let%test_unit "accum" =
 let%test_unit "accum subrange" =
   let t, map = Quickcheck.random_value tree_and_map_gen in
   let map_accum_subrange min max =
-    Map.fold_range_inclusive map ~min ~max ~init:0 ~f:(fun ~key:_ ~data acc ->
-      data + acc)
+    Map.fold_range_inclusive map ~min ~max ~init:0 ~f:(fun ~key:_ ~data acc -> data + acc)
   in
   Quickcheck.test range_gen ~f:(fun (min_key, max_key) ->
     [%test_result: int]
@@ -195,7 +194,8 @@ let%test_unit "remove_before; remove_after" =
       and m_obs =
         Option.map
           ~f:(fun (k, v) -> k, v, Map.to_alist (Map.remove m k))
-          (Map.closest_key m
+          (Map.closest_key
+             m
              (match placement with
               | `Before -> `Less_than
               | `After -> `Greater_than)
@@ -205,28 +205,31 @@ let%test_unit "remove_before; remove_after" =
 ;;
 
 let%test_unit "map" =
-  Quickcheck.test (Quickcheck.Generator.tuple2 Int.gen tree_and_map_gen) ~f:
-    (fun (amnt, (t, m)) ->
-       let f x = x * amnt in
-       let t = T.map t ~f and m = Map.map m ~f in
-       [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t))
+  Quickcheck.test
+    (Quickcheck.Generator.tuple2 Int.gen tree_and_map_gen)
+    ~f:(fun (amnt, (t, m)) ->
+      let f x = x * amnt in
+      let t = T.map t ~f and m = Map.map m ~f in
+      [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t))
 ;;
 
 let%test_unit "map_range" =
-  Quickcheck.test (Quickcheck.Generator.tuple3 range_gen tree_and_map_gen alist_gen) ~f:
-    (fun ((min, max), (t, m), replacement_alist) ->
-       let t =
-         T.map_range t ~min_key:min ~max_key:max ~f:(fun lmap ->
-           [%test_result: (int * int) list]
-             ~expect:(Map.range_to_alist m ~min ~max)
-             lmap;
-           replacement_alist)
-       and m =
-         List.fold replacement_alist
-           ~init:(Map.filter_keys m ~f:(fun x -> x < min || x > max))
-           ~f:(fun m (key, data) -> Map.set m ~key ~data)
-       in
-       [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t))
+  Quickcheck.test
+    (Quickcheck.Generator.tuple3 range_gen tree_and_map_gen alist_gen)
+    ~f:(fun ((min, max), (t, m), replacement_alist) ->
+      let t =
+        T.map_range t ~min_key:min ~max_key:max ~f:(fun lmap ->
+          [%test_result: (int * int) list]
+            ~expect:(Map.range_to_alist m ~min ~max)
+            lmap;
+          replacement_alist)
+      and m =
+        List.fold
+          replacement_alist
+          ~init:(Map.filter_keys m ~f:(fun x -> x < min || x > max))
+          ~f:(fun m (key, data) -> Map.set m ~key ~data)
+      in
+      [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t))
 ;;
 
 let%test_unit "nth in range" =
@@ -253,7 +256,8 @@ let%test_unit "rank" =
     let t, m = tree_and_map l in
     List.iter (l @ l') ~f:(fun (key, _) ->
       let idx =
-        Option.value ~default:(Map.length m)
+        Option.value
+          ~default:(Map.length m)
           (let open Option.Let_syntax in
            let%bind key, _ = Map.closest_key m `Greater_or_equal_to key in
            Map.rank m key)
@@ -312,15 +316,17 @@ let%test_unit "merge" =
     | `Right b -> Some (17 * b)
     | `Both (a, b) -> Some (a + (17 * b))
   in
-  Quickcheck.test (Quickcheck.Generator.tuple2 tree_and_map_gen tree_and_map_gen) ~f:
-    (fun ((t1, m1), (t2, m2)) ->
-       let t' = T.merge ~f:mergef t1 t2 in
-       let m' = Map.merge ~f:mergef m1 m2 in
-       [%test_result: (int * int) list] ~expect:(Map.to_alist m') (T.to_alist t'))
+  Quickcheck.test
+    (Quickcheck.Generator.tuple2 tree_and_map_gen tree_and_map_gen)
+    ~f:(fun ((t1, m1), (t2, m2)) ->
+      let t' = T.merge ~f:mergef t1 t2 in
+      let m' = Map.merge ~f:mergef m1 m2 in
+      [%test_result: (int * int) list] ~expect:(Map.to_alist m') (T.to_alist t'))
 ;;
 
 let%test_unit "split" =
-  Quickcheck.test tree_and_map_and_key_gen
+  Quickcheck.test
+    tree_and_map_and_key_gen
     ~sexp_of:[%sexp_of: T.t * int Int.Map.t * int]
     ~f:(fun (t, m, key) ->
       let left, data, right = T.split t key in

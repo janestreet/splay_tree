@@ -170,19 +170,19 @@ struct
           let left_combined = R.combine left_ctx (accum left) in
           let right_combined = R.combine right_ctx (accum right) in
           let right_with_node = R.combine (R.singleton ~key ~data) right_combined in
-          match f ~left:left_combined ~right:right_with_node with
-          | `Left ->
-            loop (Fst (ctx, key, data, right)) left ~left:left_ctx ~right:right_with_node
-          | `Right ->
-            let left_with_node = R.combine left_combined (R.singleton ~key ~data) in
-            match f ~left:left_with_node ~right:right_combined with
-            | `Left -> ctx, this
-            | `Right ->
-              loop
-                (Snd (left, key, data, ctx))
-                right
-                ~left:left_with_node
-                ~right:right_ctx
+          (match f ~left:left_combined ~right:right_with_node with
+           | `Left ->
+             loop (Fst (ctx, key, data, right)) left ~left:left_ctx ~right:right_with_node
+           | `Right ->
+             let left_with_node = R.combine left_combined (R.singleton ~key ~data) in
+             (match f ~left:left_with_node ~right:right_combined with
+              | `Left -> ctx, this
+              | `Right ->
+                loop
+                  (Snd (left, key, data, ctx))
+                  right
+                  ~left:left_with_node
+                  ~right:right_ctx))
       in
       loop Top t ~left:R.identity ~right:R.identity
     ;;
@@ -340,13 +340,13 @@ struct
         (* find_leftmost_ctx only accumulates Top and Fst constructors *)
         assert false
       | Fst (ctx, x, xv, right) ->
-        match splay empty right ctx with
-        | Empty, r -> Some (x, xv, r)
-        | Node _, _ ->
-          (* when [ctx] contains only Top and Fst constructors, as it
-             does here since it was returned by [find_leftmost_ctx], then
-             [fst (splay Empty t ctx)] will always be [Empty] for all [t]. *)
-          assert false
+        (match splay empty right ctx with
+         | Empty, r -> Some (x, xv, r)
+         | Node _, _ ->
+           (* when [ctx] contains only Top and Fst constructors, as it
+              does here since it was returned by [find_leftmost_ctx], then
+              [fst (splay Empty t ctx)] will always be [Empty] for all [t]. *)
+           assert false)
     ;;
 
     let remove_max t =
@@ -356,15 +356,15 @@ struct
         (* find_rightmost_ctx only accumulates Top and Snd constructors *)
         assert false
       | Snd (left, x, xv, ctx) ->
-        match splay left empty ctx with
-        | l, Empty ->
-          (* order reversed here to give the same type as [remove_min] *)
-          Some (x, xv, l)
-        | _, Node _ ->
-          (* when [ctx] contains only Top and Snd constructors, as it
-             does here since it was returned by [find_rightmost_ctx], then
-             [snd (splay Empty t ctx)] will always be [Empty] for all [t]. *)
-          assert false
+        (match splay left empty ctx with
+         | l, Empty ->
+           (* order reversed here to give the same type as [remove_min] *)
+           Some (x, xv, l)
+         | _, Node _ ->
+           (* when [ctx] contains only Top and Snd constructors, as it
+              does here since it was returned by [find_rightmost_ctx], then
+              [snd (splay Empty t ctx)] will always be [Empty] for all [t]. *)
+           assert false)
     ;;
 
     let concat_unchecked left right =
@@ -710,10 +710,17 @@ module Make_without_reduction (Key : Key) (Data : Data) :
     end)
 
 module Reduction_operations = struct
-  let reduce2 (type k d a b) (module R1
-                               : Reduction_operation with type key = k and type data = d and type accum = a)
-        (module R2
-          : Reduction_operation with type key = k and type data = d and type accum = b) =
+  let reduce2
+        (type k d a b)
+        (module R1 : Reduction_operation
+          with type key = k
+           and type data = d
+           and type accum = a)
+        (module R2 : Reduction_operation
+          with type key = k
+           and type data = d
+           and type accum = b)
+    =
     ( module struct
       type key = k
 
@@ -727,6 +734,9 @@ module Reduction_operations = struct
 
       let combine (l1, l2) (r1, r2) = R1.combine l1 r1, R2.combine l2 r2
     end
-    : Reduction_operation with type key = k and type data = d and type accum = a * b )
+    : Reduction_operation
+      with type key = k
+       and type data = d
+       and type accum = a * b )
   ;;
 end

@@ -38,7 +38,11 @@ module type Reduction_operation = sig
 end
 
 type ('k, 'd, 'a) reduction_operation =
-  (module Reduction_operation with type key = 'k and type data = 'd and type accum = 'a)
+  (module
+    Reduction_operation
+    with type key = 'k
+     and type data = 'd
+     and type accum = 'a)
 
 module type S = sig
   type t [@@deriving sexp]
