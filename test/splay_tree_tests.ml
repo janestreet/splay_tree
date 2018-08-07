@@ -18,7 +18,10 @@ end
 module T = Splay_tree.Make_with_reduction (Int) (Int) (Sum)
 
 
-let alist_gen = List.gen (Quickcheck.Generator.tuple2 Int.gen Int.gen)
+let alist_gen =
+  List.quickcheck_generator
+    (Quickcheck.Generator.tuple2 Int.quickcheck_generator Int.quickcheck_generator)
+;;
 
 let make_tree = List.fold ~init:T.empty ~f:(fun t (key, data) -> T.set t ~key ~data)
 
@@ -30,7 +33,10 @@ let tree_and_map =
 let tree_and_map_gen = Quickcheck.Generator.map alist_gen ~f:tree_and_map
 
 let tree_and_map_and_key_gen =
-  Quickcheck.Generator.tuple3 Bool.gen Int.gen tree_and_map_gen
+  Quickcheck.Generator.tuple3
+    Bool.quickcheck_generator
+    Int.quickcheck_generator
+    tree_and_map_gen
   |> Quickcheck.Generator.map ~f:(fun (should_floor, key, (t, m)) ->
     let key =
       (* using [should_floor] makes it likely that we sometimes pick a key that belongs to
@@ -45,7 +51,7 @@ let tree_and_map_and_key_gen =
 ;;
 
 let range_gen =
-  Quickcheck.Generator.tuple2 Int.gen Int.gen
+  Quickcheck.Generator.tuple2 Int.quickcheck_generator Int.quickcheck_generator
   |> Quickcheck.Generator.map ~f:(fun (a, b) -> if a <= b then a, b else b, a)
 ;;
 
@@ -135,7 +141,7 @@ let%test_unit "sexp" =
 ;;
 
 let%test_unit "mem; find" =
-  let list_gen = List.gen (Quickcheck.Generator.geometric ~p:0.05 0) in
+  let list_gen = List.quickcheck_generator (Quickcheck.Generator.geometric ~p:0.05 0) in
   Quickcheck.test list_gen ~f:(fun l ->
     let t, map = T.empty, Int.Map.empty in
     let t, map, _ =
@@ -206,7 +212,7 @@ let%test_unit "remove_before; remove_after" =
 
 let%test_unit "map" =
   Quickcheck.test
-    (Quickcheck.Generator.tuple2 Int.gen tree_and_map_gen)
+    (Quickcheck.Generator.tuple2 Int.quickcheck_generator tree_and_map_gen)
     ~f:(fun (amnt, (t, m)) ->
       let f x = x * amnt in
       let t = T.map t ~f and m = Map.map m ~f in
@@ -246,7 +252,7 @@ let%test_unit "nth out of range" =
     Sequence.fold ~init:T.empty (Sequence.range 0 size) ~f:(fun t v ->
       T.set t ~key:v ~data:v)
   in
-  Quickcheck.test Int.gen ~f:(fun idx ->
+  Quickcheck.test Int.quickcheck_generator ~f:(fun idx ->
     let expect = if 0 <= idx && idx < size then Some (idx, idx) else None in
     [%test_result: (int * int) option] ~expect (T.nth t idx))
 ;;
@@ -268,7 +274,10 @@ let%test_unit "rank" =
 let%test_unit "search" =
   (* Ensure that we have only small positive integers *)
   let pos_gen = Int.gen_incl 0 99_999 in
-  let alist_gen = List.gen (Quickcheck.Generator.tuple2 Int.gen pos_gen) in
+  let alist_gen =
+    List.quickcheck_generator
+      (Quickcheck.Generator.tuple2 Int.quickcheck_generator pos_gen)
+  in
   Quickcheck.test
     (Quickcheck.Generator.tuple2 pos_gen alist_gen)
     ~sexp_of:[%sexp_of: int * (int * int) list]
@@ -342,15 +351,17 @@ let%test_unit "split" =
 ;;
 
 let%test_unit "join disjoint" =
-  Quickcheck.test (Quickcheck.Generator.tuple2 Int.gen alist_gen) ~f:(fun (key, l) ->
-    let t, m = tree_and_map l in
-    let m = Map.remove m key in
-    let expect = Map.to_alist m in
-    let left, _, right = T.split t key in
-    let joined = T.join left right |> Or_error.ok_exn in
-    let joined_exn = T.join_exn left right in
-    [%test_result: (int * int) list] ~expect (T.to_alist joined);
-    [%test_result: (int * int) list] ~expect (T.to_alist joined_exn))
+  Quickcheck.test
+    (Quickcheck.Generator.tuple2 Int.quickcheck_generator alist_gen)
+    ~f:(fun (key, l) ->
+      let t, m = tree_and_map l in
+      let m = Map.remove m key in
+      let expect = Map.to_alist m in
+      let left, _, right = T.split t key in
+      let joined = T.join left right |> Or_error.ok_exn in
+      let joined_exn = T.join_exn left right in
+      [%test_result: (int * int) list] ~expect (T.to_alist joined);
+      [%test_result: (int * int) list] ~expect (T.to_alist joined_exn))
 ;;
 
 let%test_unit "join non-disjoint" =
