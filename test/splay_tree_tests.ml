@@ -3,15 +3,11 @@ open Splay_tree.Std
 
 module Sum = struct
   type key = int
-
   type data = int
-
   type accum = int
 
   let identity = 0
-
   let singleton ~key:_ ~data = data
-
   let combine = ( + )
 end
 
@@ -215,7 +211,8 @@ let%test_unit "map" =
     (Quickcheck.Generator.tuple2 Int.quickcheck_generator tree_and_map_gen)
     ~f:(fun (amnt, (t, m)) ->
       let f x = x * amnt in
-      let t = T.map t ~f and m = Map.map m ~f in
+      let t = T.map t ~f
+      and m = Map.map m ~f in
       [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t))
 ;;
 

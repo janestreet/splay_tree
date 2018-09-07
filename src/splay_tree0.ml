@@ -8,9 +8,7 @@ module Make_with_reduction
     (R : Reduction_operation with type key = Key.t and type data = Data.t) =
 struct
   type key = Key.t [@@deriving sexp]
-
   type data = Data.t [@@deriving sexp]
-
   type accum = R.accum
 
   (* [Kernel] ensures that all [Node]s
@@ -33,25 +31,15 @@ struct
           }
 
     val length : t -> int
-
     val node : t -> key -> data -> t -> t
-
     val empty : t
-
     val accum : t -> accum
   end = struct
     type size = int
 
     type t =
       | Empty
-      | Node of
-          { left : t
-          ; key : key
-          ; data : data
-          ; right : t
-          ; size : int
-          ; accum : accum
-          }
+      | Node of { left : t; key : key; data : data; right : t; size : int; accum : accum }
 
 
     let length = function
@@ -249,7 +237,8 @@ struct
            :  c   d      a   b
         *)
         splay (node (node a z zv b) y yv c) d ctx
-      | Snd (a, y, yv, Fst (ctx, z, zv, d)) | Fst (Snd (a, y, yv, ctx), z, zv, d) ->
+      | Snd (a, y, yv, Fst (ctx, z, zv, d))
+      | Fst (Snd (a, y, yv, ctx), z, zv, d) ->
         let b = l in
         let c = r in
         (*
@@ -429,7 +418,6 @@ struct
     (* Querying *)
 
     let data t = fold_right t ~init:[] ~f:(fun ~key:_ ~data acc -> data :: acc)
-
     let keys t = fold_right t ~init:[] ~f:(fun ~key ~data:_ acc -> key :: acc)
 
     let mem t x =
@@ -469,7 +457,6 @@ struct
     ;;
 
     let of_alist_exn l = Or_error.ok_exn (of_alist l)
-
     let t_of_sexp sexp = of_alist_exn ([%of_sexp: (key * data) list] sexp)
 
     let sexp_of_t t =
@@ -585,17 +572,13 @@ struct
     type t [@@deriving sexp]
 
     val create : Tree.t -> t
-
     val update : t -> Tree.t * 'a -> 'a
-
     val pack : t -> Tree.t -> t
-
     val unpack : t -> Tree.t
   end = struct
     type t = { mutable tree : Tree.t } [@@deriving sexp]
 
     let create tree = { tree }
-
     let pack (_ : t) tree = { tree }
 
     let update t (tree, res) =
@@ -610,29 +593,17 @@ struct
   include T
 
   let empty = create empty
-
   let of_alist l = Or_error.map ~f:create (of_alist l)
-
   let of_alist_exn l = create (of_alist_exn l)
-
   let to_alist t = to_alist (unpack t)
-
   let is_empty t = is_empty (unpack t)
-
   let length t = length (unpack t)
-
   let accum t = accum (unpack t)
-
   let keys t = keys (unpack t)
-
   let data t = data (unpack t)
-
   let mem t k = update t (mem (unpack t) k)
-
   let find t k = update t (find (unpack t) k)
-
   let set t ~key ~data = pack t (set (unpack t) ~key ~data)
-
   let remove t k = pack t (remove (unpack t) k)
 
   let pack_remove t = function
@@ -641,7 +612,6 @@ struct
   ;;
 
   let remove_min t = pack_remove t (remove_min (unpack t))
-
   let remove_max t = pack_remove t (remove_max (unpack t))
 
   let pack_remove_either t = function
@@ -650,9 +620,7 @@ struct
   ;;
 
   let remove_after t k = pack_remove_either t (remove_after (unpack t) k)
-
   let remove_before t k = pack_remove_either t (remove_before (unpack t) k)
-
   let map t ~f = pack t (map (unpack t) ~f)
 
   let map_range t ~min_key ~max_key ~f =
@@ -660,9 +628,7 @@ struct
   ;;
 
   let nth t idx = update t (nth (unpack t) idx)
-
   let rank t key = update t (rank (unpack t) key)
-
   let search t ~f = update t (search (unpack t) ~f)
 
   module Partition = struct
@@ -686,9 +652,7 @@ struct
   ;;
 
   let merge a b ~f = create (merge ~f (unpack a) (unpack b))
-
   let join a b = Or_error.map ~f:create (join (unpack a) (unpack b))
-
   let join_exn a b = create (join_exn (unpack a) (unpack b))
 end
 
@@ -697,15 +661,11 @@ module Make_without_reduction (Key : Key) (Data : Data) :
   Make_with_reduction (Key) (Data)
     (struct
       type key = Key.t
-
       type data = Data.t
-
       type accum = unit
 
       let identity = ()
-
       let singleton ~key:_ ~data:_ = ()
-
       let combine () () = ()
     end)
 
@@ -723,15 +683,11 @@ module Reduction_operations = struct
     =
     ( module struct
       type key = k
-
       type data = d
-
       type accum = a * b
 
       let identity = R1.identity, R2.identity
-
       let singleton ~key ~data = R1.singleton ~key ~data, R2.singleton ~key ~data
-
       let combine (l1, l2) (r1, r2) = R1.combine l1 r1, R2.combine l2 r2
     end
     : Reduction_operation
