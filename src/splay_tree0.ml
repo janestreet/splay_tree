@@ -548,12 +548,12 @@ struct
     (* this is in CPS so that it is tail-recursive *)
     let rec map_cps : 'r. t -> f:(data -> data) -> (t -> 'r) -> 'r =
       fun t ~f k ->
-        match t with
-        | Empty -> k empty
-        | Node { left; key; data; right; _ } ->
-          map_cps left ~f (fun l ->
-            let data = f data in
-            map_cps right ~f (fun r -> k (node l key data r)))
+      match t with
+      | Empty -> k empty
+      | Node { left; key; data; right; _ } ->
+        map_cps left ~f (fun l ->
+          let data = f data in
+          map_cps right ~f (fun r -> k (node l key data r)))
     ;;
 
     let map t ~f = map_cps t ~f Fn.id
