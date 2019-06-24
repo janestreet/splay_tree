@@ -35,11 +35,7 @@ module type Reduction_operation = sig
 end
 
 type ('k, 'd, 'a) reduction_operation =
-  (module
-    Reduction_operation
-    with type key = 'k
-     and type data = 'd
-     and type accum = 'a)
+  (module Reduction_operation with type key = 'k and type data = 'd and type accum = 'a)
 
 module type S = sig
   type t [@@deriving sexp]
@@ -127,7 +123,7 @@ module type S = sig
   *)
   val search
     :  t
-    -> f:(left:accum -> right:accum -> [`Right | `Left])
+    -> f:(left:accum -> right:accum -> [ `Right | `Left ])
     -> (key * data) option
 
   module Partition : sig
@@ -150,7 +146,7 @@ module type S = sig
     :  t
     -> t
     -> f:(key:key
-          -> [`Left of data | `Right of data | `Both of data * data]
+          -> [ `Left of data | `Right of data | `Both of data * data ]
           -> data option)
     -> t
 

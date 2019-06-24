@@ -39,7 +39,14 @@ struct
 
     type t =
       | Empty
-      | Node of { left : t; key : key; data : data; right : t; size : int; accum : accum }
+      | Node of
+          { left : t
+          ; key : key
+          ; data : data
+          ; right : t
+          ; size : int
+          ; accum : accum
+          }
 
 
     let length = function
@@ -237,8 +244,7 @@ struct
            :  c   d      a   b
         *)
         splay (node (node a z zv b) y yv c) d ctx
-      | Snd (a, y, yv, Fst (ctx, z, zv, d))
-      | Fst (Snd (a, y, yv, ctx), z, zv, d) ->
+      | Snd (a, y, yv, Fst (ctx, z, zv, d)) | Fst (Snd (a, y, yv, ctx), z, zv, d) ->
         let b = l in
         let c = r in
         (*
@@ -681,7 +687,7 @@ module Reduction_operations = struct
            and type data = d
            and type accum = b)
     =
-    ( module struct
+    (module struct
       type key = k
       type data = d
       type accum = a * b
@@ -689,10 +695,9 @@ module Reduction_operations = struct
       let identity = R1.identity, R2.identity
       let singleton ~key ~data = R1.singleton ~key ~data, R2.singleton ~key ~data
       let combine (l1, l2) (r1, r2) = R1.combine l1 r1, R2.combine l2 r2
-    end
-    : Reduction_operation
+    end : Reduction_operation
       with type key = k
        and type data = d
-       and type accum = a * b )
+       and type accum = a * b)
   ;;
 end
