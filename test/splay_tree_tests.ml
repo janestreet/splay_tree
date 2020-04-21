@@ -376,7 +376,7 @@ let%test_unit "join non-disjoint" =
         (T.join t1 t2 |> Result.ok |> Option.map ~f:T.to_alist))
 ;;
 
-open! Expect_test_helpers_kernel
+open! Expect_test_helpers_core
 
 let%expect_test _ =
   let t = T.empty in
