@@ -105,8 +105,7 @@ let%test_unit "accum" =
 let%test_unit "accum subrange" =
   let t, map = Quickcheck.random_value tree_and_map_gen in
   let map_accum_subrange min max =
-    Map.fold_range_inclusive map ~min ~max ~init:0 ~f:(fun ~key:_ ~data acc ->
-      data + acc)
+    Map.fold_range_inclusive map ~min ~max ~init:0 ~f:(fun ~key:_ ~data acc -> data + acc)
   in
   Quickcheck.test range_gen ~f:(fun (min_key, max_key) ->
     [%test_result: int]
@@ -224,9 +223,7 @@ let%test_unit "map_range" =
     ~f:(fun ((min, max), (t, m), replacement_alist) ->
       let t =
         T.map_range t ~min_key:min ~max_key:max ~f:(fun lmap ->
-          [%test_result: (int * int) list]
-            ~expect:(Map.range_to_alist m ~min ~max)
-            lmap;
+          [%test_result: (int * int) list] ~expect:(Map.range_to_alist m ~min ~max) lmap;
           replacement_alist)
       and m =
         List.fold

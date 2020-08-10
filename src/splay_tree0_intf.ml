@@ -145,7 +145,8 @@ module type S = sig
   val merge
     :  t
     -> t
-    -> f:(key:key
+    -> f:
+         (key:key
           -> [ `Left of data | `Right of data | `Both of data * data ]
           -> data option)
     -> t

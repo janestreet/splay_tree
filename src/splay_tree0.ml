@@ -543,8 +543,7 @@ struct
         if Key.compare k1 k2 >= 0
         then
           error_s
-            [%message
-              "Trees were overlapping" ~left_max:(k1 : key) ~right_min:(k2 : key)]
+            [%message "Trees were overlapping" ~left_max:(k1 : key) ~right_min:(k2 : key)]
         else Ok (node l k2 v2 r)
     ;;
 
