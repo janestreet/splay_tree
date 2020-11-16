@@ -235,13 +235,13 @@ struct
         let c = l in
         let d = r in
         (*
-           :        z                 [x]
-           :       / \                / \
-           :      a   y              y   d
+           :        z             [x]
+           :       / \            / \
+           :      a   y          y   d
            :     / \     =>     / \
            :    b  [x]         z   c
-           :   / \        / \
-           :  c   d      a   b
+           :   / \            / \
+           :  c   d          a   b
         *)
         splay (node (node a z zv b) y yv c) d ctx
       | Snd (a, y, yv, Fst (ctx, z, zv, d)) | Fst (Snd (a, y, yv, ctx), z, zv, d) ->
@@ -253,8 +253,8 @@ struct
            :      y   d         /   \           a   z
            :     / \     =>    y     z    <=       / \
            :    a  [x]        / \   / \          [x]  d
-           :   / \       a   b c   d         / \
-           :  b   c                         b   c
+           :   / \           a   b c   d         / \
+           :  b   c                             b   c
         *)
         splay (node a y yv b) (node c z zv d) ctx
     ;;
