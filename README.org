@@ -1,4 +1,3 @@
-#+UUID: 618b574e-4023-3401-5de7-70278d44899d
 
 A splay tree implementation.
 
