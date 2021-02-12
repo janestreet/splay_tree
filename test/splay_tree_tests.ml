@@ -364,9 +364,10 @@ let%test_unit "join non-disjoint" =
   Quickcheck.test (Quickcheck.Generator.tuple2 alist_gen alist_gen) ~f:(fun (l1, l2) ->
     let t1, m1 = tree_and_map l1 in
     let t2, m2 = tree_and_map l2 in
-    if Option.both (Map.max_elt m1) (Map.min_elt m2)
-       |> Option.value_map ~default:true ~f:(fun (a, b) -> a < b)
-       |> not
+    if
+      Option.both (Map.max_elt m1) (Map.min_elt m2)
+      |> Option.value_map ~default:true ~f:(fun (a, b) -> a < b)
+      |> not
     then
       [%test_result: (int * int) list option]
         ~expect:None
