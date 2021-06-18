@@ -1,4 +1,4 @@
-open Core_kernel
+open Core
 
 (** Splay trees are binary search trees that move recently accessed nodes closer to the
     root for easier access.  They have amortized O(log n)-time access for a large enough
