@@ -1,2 +1,2 @@
-(library (name splay_tree) (public_name splay_tree)
- (libraries core_kernel.core) (preprocess (pps ppx_jane)))
+(library (name splay_tree) (public_name splay_tree) (libraries core)
+ (preprocess (pps ppx_jane)))
