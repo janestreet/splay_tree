@@ -11,9 +11,9 @@ build: [
 ]
 depends: [
   "ocaml" {>= "4.08.0"}
-  "core_kernel"
+  "core"
   "ppx_jane"
-  "dune"        {>= "2.0.0"}
+  "dune"     {>= "2.0.0"}
 ]
 synopsis: "A splay tree implementation"
 description: "
