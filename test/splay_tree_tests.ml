@@ -40,8 +40,7 @@ let tree_and_map_and_key_gen =
          the splay_tree/map *)
       if should_floor
       then
-        Map.closest_key m `Less_or_equal_to key
-        |> Option.value_map ~f:fst ~default:key
+        Map.closest_key m `Less_or_equal_to key |> Option.value_map ~f:fst ~default:key
       else key
     in
     t, m, key)
