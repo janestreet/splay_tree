@@ -109,18 +109,18 @@ struct
 
     let find_ctx : t -> key -> ctx * t =
       fun t x ->
-        let rec loop ctx this =
-          match this with
-          | Empty -> ctx, this
-          | Node { left; key; data; right; _ } ->
-            let cmp = Key.compare x key in
-            if cmp < 0
-            then loop (Fst (ctx, key, data, right)) left
-            else if cmp > 0
-            then loop (Snd (left, key, data, ctx)) right
-            else ctx, this
-        in
-        loop Top t
+      let rec loop ctx this =
+        match this with
+        | Empty -> ctx, this
+        | Node { left; key; data; right; _ } ->
+          let cmp = Key.compare x key in
+          if cmp < 0
+          then loop (Fst (ctx, key, data, right)) left
+          else if cmp > 0
+          then loop (Snd (left, key, data, ctx)) right
+          else ctx, this
+      in
+      loop Top t
     ;;
 
     let find_leftmost_ctx t =
@@ -411,14 +411,14 @@ struct
 
     let fold_right : 'b. t -> init:'b -> f:(key:key -> data:data -> 'b -> 'b) -> 'b =
       fun t ~init ~f ->
-        let rec loop acc = function
-          | [] -> acc
-          | `Elem (key, data) :: to_visit -> loop (f ~key ~data acc) to_visit
-          | `Tree Empty :: to_visit -> loop acc to_visit
-          | `Tree (Node { left; key; data; right; _ }) :: to_visit ->
-            loop acc (`Tree right :: `Elem (key, data) :: `Tree left :: to_visit)
-        in
-        loop init [ `Tree t ]
+      let rec loop acc = function
+        | [] -> acc
+        | `Elem (key, data) :: to_visit -> loop (f ~key ~data acc) to_visit
+        | `Tree Empty :: to_visit -> loop acc to_visit
+        | `Tree (Node { left; key; data; right; _ }) :: to_visit ->
+          loop acc (`Tree right :: `Elem (key, data) :: `Tree left :: to_visit)
+      in
+      loop init [ `Tree t ]
     ;;
 
     (* Querying *)
