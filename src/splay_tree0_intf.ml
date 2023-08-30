@@ -56,8 +56,6 @@ module type S = sig
   val find : t -> key -> data option
   val set : t -> key:key -> data:data -> t
   val remove : t -> key -> t
-
-
   val remove_min : t -> (key * data * t) option
   val remove_max : t -> (key * data * t) option
   val remove_after : t -> key -> (key * data * t) option
@@ -179,9 +177,9 @@ module type Splay_tree = sig
   module type S = S
 
   module Make_with_reduction
-      (Key : Key)
-      (Data : Data)
-      (R : Reduction_operation with type key = Key.t and type data = Data.t) :
+    (Key : Key)
+    (Data : Data)
+    (R : Reduction_operation with type key = Key.t and type data = Data.t) :
     S with type key = Key.t and type data = Data.t and type accum = R.accum
 
   module Make_without_reduction (Key : Key) (Data : Data) :
@@ -194,4 +192,3 @@ module type Splay_tree = sig
       -> ('k, 'd, 'a * 'b) reduction_operation
   end
 end
-

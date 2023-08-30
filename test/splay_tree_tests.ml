@@ -14,7 +14,6 @@ end
 
 module T = Splay_tree.Make_with_reduction (Int) (Int) (Sum)
 
-
 let alist_gen =
   List.quickcheck_generator
     (Quickcheck.Generator.tuple2 Int.quickcheck_generator Int.quickcheck_generator)
@@ -35,15 +34,15 @@ let tree_and_map_and_key_gen =
     Int.quickcheck_generator
     tree_and_map_gen
   |> Quickcheck.Generator.map ~f:(fun (should_floor, key, (t, m)) ->
-    let key =
-      (* using [should_floor] makes it likely that we sometimes pick a key that belongs to
+       let key =
+         (* using [should_floor] makes it likely that we sometimes pick a key that belongs to
          the splay_tree/map *)
-      if should_floor
-      then
-        Map.closest_key m `Less_or_equal_to key |> Option.value_map ~f:fst ~default:key
-      else key
-    in
-    t, m, key)
+         if should_floor
+         then
+           Map.closest_key m `Less_or_equal_to key |> Option.value_map ~f:fst ~default:key
+         else key
+       in
+       t, m, key)
 ;;
 
 let range_gen =
@@ -210,27 +209,27 @@ let%test_unit "map" =
   Quickcheck.test
     (Quickcheck.Generator.tuple2 Int.quickcheck_generator tree_and_map_gen)
     ~f:(fun (amnt, (t, m)) ->
-      let f x = x * amnt in
-      let t = T.map t ~f
-      and m = Map.map m ~f in
-      [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t))
+    let f x = x * amnt in
+    let t = T.map t ~f
+    and m = Map.map m ~f in
+    [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t))
 ;;
 
 let%test_unit "map_range" =
   Quickcheck.test
     (Quickcheck.Generator.tuple3 range_gen tree_and_map_gen alist_gen)
     ~f:(fun ((min, max), (t, m), replacement_alist) ->
-      let t =
-        T.map_range t ~min_key:min ~max_key:max ~f:(fun lmap ->
-          [%test_result: (int * int) list] ~expect:(Map.range_to_alist m ~min ~max) lmap;
-          replacement_alist)
-      and m =
-        List.fold
-          replacement_alist
-          ~init:(Map.filter_keys m ~f:(fun x -> x < min || x > max))
-          ~f:(fun m (key, data) -> Map.set m ~key ~data)
-      in
-      [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t))
+    let t =
+      T.map_range t ~min_key:min ~max_key:max ~f:(fun lmap ->
+        [%test_result: (int * int) list] ~expect:(Map.range_to_alist m ~min ~max) lmap;
+        replacement_alist)
+    and m =
+      List.fold
+        replacement_alist
+        ~init:(Map.filter_keys m ~f:(fun x -> x < min || x > max))
+        ~f:(fun m (key, data) -> Map.set m ~key ~data)
+    in
+    [%test_result: (int * int) list] ~expect:(Map.to_alist m) (T.to_alist t))
 ;;
 
 let%test_unit "nth in range" =
@@ -277,18 +276,18 @@ let%test_unit "search" =
     (Quickcheck.Generator.tuple2 pos_gen alist_gen)
     ~sexp_of:[%sexp_of: int * (int * int) list]
     ~f:(fun (pos, l) ->
-      let t, _ = tree_and_map l in
-      let f ~left ~right =
-        assert (T.accum t = left + right);
-        if pos < left then `Left else `Right
-      in
-      let kv = T.search ~f t in
-      match kv with
-      | None -> assert (T.accum t <= pos)
-      | Some (key, data) ->
-        let l = (T.partition ~min_key:key t).lt in
-        assert (T.accum l <= pos);
-        assert (pos < T.accum l + data))
+    let t, _ = tree_and_map l in
+    let f ~left ~right =
+      assert (T.accum t = left + right);
+      if pos < left then `Left else `Right
+    in
+    let kv = T.search ~f t in
+    match kv with
+    | None -> assert (T.accum t <= pos)
+    | Some (key, data) ->
+      let l = (T.partition ~min_key:key t).lt in
+      assert (T.accum l <= pos);
+      assert (pos < T.accum l + data))
 ;;
 
 let%test_unit "partition; subrange" =
@@ -296,22 +295,22 @@ let%test_unit "partition; subrange" =
     (Quickcheck.Generator.tuple2 range_gen tree_and_map_gen)
     ~sexp_of:[%sexp_of: (int * int) * (T.t * int Int.Map.t)]
     ~f:(fun ((min, max), (t, m)) ->
-      let { T.Partition.lt; mid; gt } = T.partition ~min_key:min ~max_key:max t in
-      let mid_subrange = T.subrange ~min_key:min ~max_key:max t in
-      [%test_result: (int * int) list]
-        ~expect:
-          (Map.subrange m ~lower_bound:Unbounded ~upper_bound:(Excl min) |> Map.to_alist)
-        (T.to_alist lt);
-      [%test_result: (int * int) list]
-        ~expect:(Map.range_to_alist ~min ~max m)
-        (T.to_alist mid);
-      [%test_result: (int * int) list]
-        ~expect:(Map.range_to_alist ~min ~max m)
-        (T.to_alist mid_subrange);
-      [%test_result: (int * int) list]
-        ~expect:
-          (Map.subrange m ~lower_bound:(Excl max) ~upper_bound:Unbounded |> Map.to_alist)
-        (T.to_alist gt))
+    let { T.Partition.lt; mid; gt } = T.partition ~min_key:min ~max_key:max t in
+    let mid_subrange = T.subrange ~min_key:min ~max_key:max t in
+    [%test_result: (int * int) list]
+      ~expect:
+        (Map.subrange m ~lower_bound:Unbounded ~upper_bound:(Excl min) |> Map.to_alist)
+      (T.to_alist lt);
+    [%test_result: (int * int) list]
+      ~expect:(Map.range_to_alist ~min ~max m)
+      (T.to_alist mid);
+    [%test_result: (int * int) list]
+      ~expect:(Map.range_to_alist ~min ~max m)
+      (T.to_alist mid_subrange);
+    [%test_result: (int * int) list]
+      ~expect:
+        (Map.subrange m ~lower_bound:(Excl max) ~upper_bound:Unbounded |> Map.to_alist)
+      (T.to_alist gt))
 ;;
 
 let%test_unit "merge" =
@@ -323,9 +322,9 @@ let%test_unit "merge" =
   Quickcheck.test
     (Quickcheck.Generator.tuple2 tree_and_map_gen tree_and_map_gen)
     ~f:(fun ((t1, m1), (t2, m2)) ->
-      let t' = T.merge ~f:mergef t1 t2 in
-      let m' = Map.merge ~f:mergef m1 m2 in
-      [%test_result: (int * int) list] ~expect:(Map.to_alist m') (T.to_alist t'))
+    let t' = T.merge ~f:mergef t1 t2 in
+    let m' = Map.merge ~f:mergef m1 m2 in
+    [%test_result: (int * int) list] ~expect:(Map.to_alist m') (T.to_alist t'))
 ;;
 
 let%test_unit "split" =
@@ -333,30 +332,30 @@ let%test_unit "split" =
     tree_and_map_and_key_gen
     ~sexp_of:[%sexp_of: T.t * int Int.Map.t * int]
     ~f:(fun (t, m, key) ->
-      let left, data, right = T.split t key in
-      [%test_result: int option] ~expect:(Map.find m key) data;
-      [%test_result: (int * int) list]
-        (T.to_alist left)
-        ~expect:
-          (Map.subrange ~lower_bound:Unbounded ~upper_bound:(Excl key) m |> Map.to_alist);
-      [%test_result: (int * int) list]
-        (T.to_alist right)
-        ~expect:
-          (Map.subrange ~lower_bound:(Excl key) ~upper_bound:Unbounded m |> Map.to_alist))
+    let left, data, right = T.split t key in
+    [%test_result: int option] ~expect:(Map.find m key) data;
+    [%test_result: (int * int) list]
+      (T.to_alist left)
+      ~expect:
+        (Map.subrange ~lower_bound:Unbounded ~upper_bound:(Excl key) m |> Map.to_alist);
+    [%test_result: (int * int) list]
+      (T.to_alist right)
+      ~expect:
+        (Map.subrange ~lower_bound:(Excl key) ~upper_bound:Unbounded m |> Map.to_alist))
 ;;
 
 let%test_unit "join disjoint" =
   Quickcheck.test
     (Quickcheck.Generator.tuple2 Int.quickcheck_generator alist_gen)
     ~f:(fun (key, l) ->
-      let t, m = tree_and_map l in
-      let m = Map.remove m key in
-      let expect = Map.to_alist m in
-      let left, _, right = T.split t key in
-      let joined = T.join left right |> Or_error.ok_exn in
-      let joined_exn = T.join_exn left right in
-      [%test_result: (int * int) list] ~expect (T.to_alist joined);
-      [%test_result: (int * int) list] ~expect (T.to_alist joined_exn))
+    let t, m = tree_and_map l in
+    let m = Map.remove m key in
+    let expect = Map.to_alist m in
+    let left, _, right = T.split t key in
+    let joined = T.join left right |> Or_error.ok_exn in
+    let joined_exn = T.join_exn left right in
+    [%test_result: (int * int) list] ~expect (T.to_alist joined);
+    [%test_result: (int * int) list] ~expect (T.to_alist joined_exn))
 ;;
 
 let%test_unit "join non-disjoint" =

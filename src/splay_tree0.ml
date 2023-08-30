@@ -3,9 +3,9 @@ open Int.Replace_polymorphic_compare
 include Splay_tree0_intf
 
 module Make_with_reduction
-    (Key : Key)
-    (Data : Data)
-    (R : Reduction_operation with type key = Key.t and type data = Data.t) =
+  (Key : Key)
+  (Data : Data)
+  (R : Reduction_operation with type key = Key.t and type data = Data.t) =
 struct
   type key = Key.t [@@deriving sexp]
   type data = Data.t [@@deriving sexp]
@@ -47,7 +47,6 @@ struct
           ; size : int
           ; accum : accum
           }
-
 
     let length = function
       | Empty -> 0
@@ -497,7 +496,6 @@ struct
 
     let subrange ?min_key ?max_key t = (partition ?min_key ?max_key t).mid
 
-
     let rec merge left right ~f =
       match left, right with
       | Empty, Empty -> empty
@@ -676,15 +674,15 @@ module Make_without_reduction (Key : Key) (Data : Data) :
 
 module Reduction_operations = struct
   let reduce2
-        (type k d a b)
-        (module R1 : Reduction_operation
-          with type key = k
-           and type data = d
-           and type accum = a)
-        (module R2 : Reduction_operation
-          with type key = k
-           and type data = d
-           and type accum = b)
+    (type k d a b)
+    (module R1 : Reduction_operation
+      with type key = k
+       and type data = d
+       and type accum = a)
+    (module R2 : Reduction_operation
+      with type key = k
+       and type data = d
+       and type accum = b)
     =
     (module struct
       type key = k
