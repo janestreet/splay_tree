@@ -1,3 +1,5 @@
-(library (name splay_tree_test)
+(library
+ (name splay_tree_test)
  (libraries core splay_tree expect_test_helpers_core)
- (preprocess (pps ppx_jane)))
+ (preprocess
+  (pps ppx_jane)))
