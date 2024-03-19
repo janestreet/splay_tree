@@ -404,5 +404,5 @@ let%expect_test _ =
         (1 9991))))
     ("after remove_before" (removed (0 9990)) (leftover ((1 9991))))
     ("after remove_after" (removed (1 9991)) (leftover ((0 9990))))
-  |}]
+    |}]
 ;;
