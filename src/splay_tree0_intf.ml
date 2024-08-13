@@ -177,9 +177,9 @@ module type Splay_tree = sig
   module type S = S
 
   module Make_with_reduction
-    (Key : Key)
-    (Data : Data)
-    (R : Reduction_operation with type key = Key.t and type data = Data.t) :
+      (Key : Key)
+      (Data : Data)
+      (R : Reduction_operation with type key = Key.t and type data = Data.t) :
     S with type key = Key.t and type data = Data.t and type accum = R.accum
 
   module Make_without_reduction (Key : Key) (Data : Data) :
