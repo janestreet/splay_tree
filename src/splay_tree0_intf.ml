@@ -1,7 +1,7 @@
 open Core
 
 (** Splay trees are binary search trees that move recently accessed nodes closer to the
-    root for easier access.  They have amortized O(log n)-time access for a large enough
+    root for easier access. They have amortized O(log n)-time access for a large enough
     sequence of primitive operations.
 
     As a heuristic, a splay tree may outperform other trees such as red-black trees when
@@ -10,8 +10,7 @@ open Core
     The amortized complexity analysis only applies if [t] is used as a linear type, i.e.
     each [t] returned by access operations is used for the next operation, instead of
     being discarded (similar to Fqueue). If, instead, it is used as a persistent data
-    structure, most primitive operations have O(n) complexity.
-*)
+    structure, most primitive operations have O(n) complexity. *)
 
 module type Key = sig
   type t [@@deriving sexp, compare]
@@ -29,8 +28,8 @@ module type Reduction_operation = sig
   val identity : accum
   val singleton : key:key -> data:data -> accum
 
-  (** [combine] is required to be associative and have [identity] as its identity.
-      In other words, they must form a monoid. *)
+  (** [combine] is required to be associative and have [identity] as its identity. In
+      other words, they must form a monoid. *)
   val combine : accum -> accum -> accum
 end
 
@@ -75,7 +74,8 @@ module type S = sig
       words, the length of the left subtree after a [split t key]. *)
   val rank : t -> key -> int
 
-  (** [search] implements bisection search over [t] based on the [accum] values
+  (** {v
+ [search] implements bisection search over [t] based on the [accum] values
       of its prefixes.
 
       Let's consider a [t] consisting of four elements [a; b; c; d] (see diagram below)
@@ -118,7 +118,7 @@ module type S = sig
       {[
         let f ~left ~right:_ = if x < left then `Left else `Right
       ]}
-  *)
+      v} *)
   val search
     :  t
     -> f:(left:accum -> right:accum -> [ `Right | `Left ])
@@ -160,8 +160,7 @@ module type S = sig
       the minimum key of [t2].
 
       Currently the cost of [join] is not fully amortized, so it should be considered
-      worst-case linear time.
-  *)
+      worst-case linear time. *)
   val join : t -> t -> t Or_error.t
 
   val join_exn : t -> t -> t
@@ -177,9 +176,9 @@ module type Splay_tree = sig
   module type S = S
 
   module Make_with_reduction
-    (Key : Key)
-    (Data : Data)
-    (R : Reduction_operation with type key = Key.t and type data = Data.t) :
+      (Key : Key)
+      (Data : Data)
+      (R : Reduction_operation with type key = Key.t and type data = Data.t) :
     S with type key = Key.t and type data = Data.t and type accum = R.accum
 
   module Make_without_reduction (Key : Key) (Data : Data) :

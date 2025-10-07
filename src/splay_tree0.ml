@@ -3,9 +3,9 @@ open Int.Replace_polymorphic_compare
 include Splay_tree0_intf
 
 module Make_with_reduction
-  (Key : Key)
-  (Data : Data)
-  (R : Reduction_operation with type key = Key.t and type data = Data.t) =
+    (Key : Key)
+    (Data : Data)
+    (R : Reduction_operation with type key = Key.t and type data = Data.t) =
 struct
   type key = Key.t [@@deriving sexp]
   type data = Data.t [@@deriving sexp]
