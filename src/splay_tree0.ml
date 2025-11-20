@@ -91,8 +91,8 @@ struct
 
     (* [plug t ctx] restores the overall tree from the subtree [t] and its context [ctx].
 
-       NOTE: this definition is used nowhere in the remainder of this file. It serves
-       only to indicate what a context /means/.
+       NOTE: this definition is used nowhere in the remainder of this file. It serves only
+       to indicate what a context /means/.
     *)
     let rec _plug t = function
       | Top -> t
@@ -198,7 +198,7 @@ struct
       | Fst (Top, y, yv, c) ->
         let a = l in
         let b = r in
-        (*
+        (*=
            :      y         [x]
            :     / \        / \
            :   [x]  c  =>  a   y
@@ -209,7 +209,7 @@ struct
       | Snd (a, y, yv, Top) ->
         let b = l in
         let c = r in
-        (*
+        (*=
            :      y             [x]
            :     / \            / \
            :    a  [x]   =>    y   c
@@ -220,7 +220,7 @@ struct
       | Fst (Fst (ctx, z, zv, d), y, yv, c) ->
         let a = l in
         let b = r in
-        (*
+        (*=
            :        z         [x]
            :       / \        / \
            :      y   d      a   y
@@ -233,7 +233,7 @@ struct
       | Snd (b, y, yv, Snd (a, z, zv, ctx)) ->
         let c = l in
         let d = r in
-        (*
+        (*=
            :        z             [x]
            :       / \            / \
            :      a   y          y   d
@@ -246,7 +246,7 @@ struct
       | Snd (a, y, yv, Fst (ctx, z, zv, d)) | Fst (Snd (a, y, yv, ctx), z, zv, d) ->
         let b = l in
         let c = r in
-        (*
+        (*=
            :        z                             y
            :       / \           [x]             / \
            :      y   d         /   \           a   z
@@ -337,9 +337,9 @@ struct
         (match splay empty right ctx with
          | Empty, r -> Some (x, xv, r)
          | Node _, _ ->
-           (* when [ctx] contains only Top and Fst constructors, as it
-              does here since it was returned by [find_leftmost_ctx], then
-              [fst (splay Empty t ctx)] will always be [Empty] for all [t]. *)
+           (* when [ctx] contains only Top and Fst constructors, as it does here since it
+              was returned by [find_leftmost_ctx], then [fst (splay Empty t ctx)] will
+              always be [Empty] for all [t]. *)
            assert false)
     ;;
 
@@ -355,9 +355,9 @@ struct
            (* order reversed here to give the same type as [remove_min] *)
            Some (x, xv, l)
          | _, Node _ ->
-           (* when [ctx] contains only Top and Snd constructors, as it
-              does here since it was returned by [find_rightmost_ctx], then
-              [snd (splay Empty t ctx)] will always be [Empty] for all [t]. *)
+           (* when [ctx] contains only Top and Snd constructors, as it does here since it
+              was returned by [find_rightmost_ctx], then [snd (splay Empty t ctx)] will
+              always be [Empty] for all [t]. *)
            assert false)
     ;;
 
