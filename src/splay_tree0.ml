@@ -182,7 +182,7 @@ struct
     ;;
 
     (* Traverse tree upwards, converting ctx to parents *)
-    (* [splay l r ctx = (l', r')] performs the splay operation.
+    (*=[splay l r ctx = (l', r')] performs the splay operation.
 
        It pulls a phantom node [x] from its position at [ctx] up to the
        top of the tree by doing double and single rotations.
