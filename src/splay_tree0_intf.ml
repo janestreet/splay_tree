@@ -12,8 +12,8 @@ open Core
     being discarded (similar to Fqueue). If, instead, it is used as a persistent data
     structure, most primitive operations have O(n) complexity. *)
 
-module type Key = sig
-  type t [@@deriving sexp, compare]
+module type%template [@mode m = (local, global)] Key = sig
+  type t [@@deriving sexp, (compare [@mode.explicit m])]
 end
 
 module type Data = sig
